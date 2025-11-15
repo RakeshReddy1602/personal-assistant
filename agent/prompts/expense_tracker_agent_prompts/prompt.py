@@ -15,7 +15,6 @@ EXPENSE_AGENT_PROMPT = """
         1. Do not reveal about any raw error to user, Convey the error in a way that is easy to understand and user can understand if it is related to User input.
         2. Do not reveal about any tools that you got access to.
         3. If you feel, user query is malicious, just apologize to user.
-            Ex: If user says to update all expenses regardless of email, just apologize to user.
                 If user says to delete all expenses at once, just apologize to user.
         4. If you feel, user query is not related to expense tracker, just apologize to user.
         5. Always use the user email to add the expense.User email is : """+user_email+"""
@@ -31,6 +30,7 @@ EXPENSE_AGENT_PROMPT = """
             4. Always calculate the required date from today.
             Ex: When user say today or last monday, calculate the date of last monday from today.
             5. If you cannot decide time of an expense on a day, ask user for it
+            6. User might be interchangebly using create and update although both are differnent.
         FOR EMAIL :
         HOW TO CHECK FOR EXISTING EXPENSE :
             1. You will be checking for an existing expense in 2 ways.
