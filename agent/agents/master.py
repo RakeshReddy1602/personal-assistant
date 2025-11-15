@@ -120,8 +120,8 @@ async def handle_master(state: AssistantState) -> AssistantState:
     
     The supervisor delegates tasks to appropriate sub-agents based on user queries.
     """
-    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-    model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash-exp")
+    api_key = os.getenv("GEMINI_API_KEY")
+    model_name = os.getenv("GEMINI_MODEL")
     
     if not api_key:
         state["response"] = "Error: GEMINI_API_KEY is not set."
@@ -144,34 +144,7 @@ async def handle_master(state: AssistantState) -> AssistantState:
         history = state.get("history", [])
         
         # Enhanced system prompt for supervisor
-        supervisor_prompt = f"""
-{MASTER_AGENT_SYSTEM_PROMPT}
-
-SUPERVISOR RESPONSIBILITIES:
-You are a master supervisor agent that coordinates specialized sub-agents. You have access to three expert assistants:
-
-1. **mail_agent_tool** - Expert in email management
-   - Use for: reading, sending, managing emails and attachments
-   
-2. **calendar_agent_tool** - Expert in calendar and scheduling
-   - Use for: creating events, managing schedules, checking availability
-   
-3. **expense_agent_tool** - Expert in expense tracking
-   - Use for: recording expenses, generating reports, budget analysis
-
-DELEGATION STRATEGY:
-- Analyze the user's request and determine which sub-agent(s) to use
-- Delegate specific tasks to the appropriate specialized agent
-- You can call multiple agents if the task requires it (e.g., "Check my calendar and then email the attendees")
-- Synthesize responses from multiple agents into a coherent answer
-- Handle simple queries directly without delegating if appropriate
-
-IMPORTANT:
-- Always delegate domain-specific tasks to the specialized agents
-- Don't try to handle email, calendar, or expense operations yourself
-- Provide context when delegating to sub-agents
-- Present sub-agent responses naturally to the user
-"""
+        supervisor_prompt = MASTER_AGENT_SYSTEM_PROMPT
         
         messages = _build_langchain_messages_from_history(
             history,
