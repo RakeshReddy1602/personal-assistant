@@ -1,0 +1,19 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+requests>=2.31.0
+
+# Gmail API and OAuth
+google-api-python-client>=2.149.0
+google-auth>=2.35.0
+google-auth-oauthlib>=1.2.1
+
+# Gemini API via LangChain
+langchain-google-genai>=2.1.0
+
+## Agents / Graph orchestration
+langchain>=0.3.0
+langgraph>=0.1.0
+
+fastmcp>=0.4.0
+
+
