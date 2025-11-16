@@ -1,6 +1,4 @@
-import argparse
-import json
-from typing import Dict
+from typing import Dict, Optional
 
 from agent.states.assistant_state import AssistantState
 from agent.constants import CATEGORIES, DEFAULT_ROUTER_MODEL
@@ -15,8 +13,8 @@ ROUTER_SYSTEM_PROMPT = (
     """Rules: 
     - You must be stricyly matching the user's request to the available categories only.
     - You must return the exact category that matches the user's request.
-    - If the user's request is not related to any of the categories, return 'none'.
-    - Return strict JSON with key 'category' only. No extra text.\n"
+    - If the user's request is not related to any of the categories, return 'none'
+    - You must return the category from specified list and just category name.
     """
 )
 
@@ -28,10 +26,10 @@ def route_category(user_query: str) -> str:
         + user_query.strip()
         + "\nRespond with: {\"category\": \"<one_of_categories>\"}"
     )
-
-    result: Dict | None = generate_json(model=DEFAULT_ROUTER_MODEL, prompt=prompt)
-    category = (result or {}).get("category") if isinstance(result, dict) else None
-    return category
+    result: Optional[Dict] = generate_json(model=DEFAULT_ROUTER_MODEL, prompt=prompt)
+    if result and "category" in result:
+        return result["category"]
+    return "none"
 
 
 def get_assistant_state(user_query: str) -> AssistantState:
@@ -43,6 +41,7 @@ def router_node(state: AssistantState) -> AssistantState:
     """
     LangGraph node: classify state's current query and set category_to_be_served.
     """
-    category = route_category(state.get("query_to_be_served", "") or "")
-    state["category_to_be_served"] = category or "none"
+    query = state.get("query_to_be_served", "") or ""
+    category = route_category(query)
+    state["category_to_be_served"] = category
     return state

@@ -14,7 +14,7 @@ def _ollama_base_url() -> str:
 
 def generate(model: str, prompt: str, **kwargs: Any) -> str:
     url = f"{_ollama_base_url()}/api/generate"
-    data: Dict[str, Any] = {"model": model, "prompt": prompt}
+    data: Dict[str, Any] = {"model": model, "prompt": prompt, "stream": False}
     data.update(kwargs)
     resp = requests.post(url, json=data, timeout=60)
     resp.raise_for_status()
@@ -27,22 +27,10 @@ def generate(model: str, prompt: str, **kwargs: Any) -> str:
         return resp.text
 
 
-def generate_json(model: str, prompt: str) -> Optional[Dict[str, Any]]:
-    text = generate(model=model, prompt=prompt, stream=False)
-    # Try direct JSON
+def generate_json(model: str, prompt: str, **kwargs: Any) -> Optional[Dict]:
+    """Generate JSON response from Ollama."""
+    response = generate(model, prompt, format="json", **kwargs)
     try:
-        return json.loads(text)
+        return json.loads(response)
     except json.JSONDecodeError:
-        pass
-
-    # Fallback: extract first JSON block
-    start = text.find("{")
-    end = text.rfind("}")
-    if start != -1 and end != -1 and end > start:
-        try:
-            return json.loads(text[start : end + 1])
-        except json.JSONDecodeError:
-            return None
-    return None
-
-
+        return None
