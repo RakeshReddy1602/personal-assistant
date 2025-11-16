@@ -1,10 +1,15 @@
 import requests
+import os
 from datetime import datetime
 from typing import Any, Dict, Optional
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Base URL for the expense tracker API
-API_BASE_URL = "http://localhost:3000"
-
+API_BASE_URL = os.getenv("EXPENSE_TRACKER_SERVER_URL")
+if not API_BASE_URL:
+    raise ValueError("EXPENSE_TRACKER_SERVER_URL is not set")
 
 def add_expense(
     amount: float,
