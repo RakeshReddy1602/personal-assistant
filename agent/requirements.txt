@@ -1,20 +1,16 @@
-fastapi>=0.115.0
-uvicorn[standard]>=0.30.0
-requests>=2.31.0
+# Existing dependencies
+langchain>=0.1.0
+langchain-google-genai>=0.0.5
+python-dotenv>=1.0.0
+textual>=0.47.1
+rich>=13.7.0
+langgraph>=0.0.20
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+google-api-python-client>=2.108.0
 
-# Gmail API and OAuth
-google-api-python-client>=2.149.0
-google-auth>=2.35.0
-google-auth-oauthlib>=1.2.1
+# New: Redis for eval queue
+redis>=5.0.0
 
-# Gemini API via LangChain
-langchain-google-genai>=2.1.0
-
-## Agents / Graph orchestration
-langchain>=0.3.0
-langgraph>=0.1.0
-
-fastmcp>=0.4.0
-
-# UI/UX
-textual>=0.30.0
+# New: HTTP client for eval server
+httpx>=0.25.0

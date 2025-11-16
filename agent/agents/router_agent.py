@@ -3,6 +3,7 @@ from typing import Dict, Optional
 from agent.states.assistant_state import AssistantState
 from agent.constants import CATEGORIES, DEFAULT_ROUTER_MODEL
 from agent.clients.ollama_client import generate_json
+from agent.eval_queue import publish_eval_event
 
 
 ROUTER_SYSTEM_PROMPT = (
@@ -41,7 +42,26 @@ def router_node(state: AssistantState) -> AssistantState:
     """
     LangGraph node: classify state's current query and set category_to_be_served.
     """
+    import time
+    start_time = time.time()
+    
     query = state.get("query_to_be_served", "") or ""
     category = route_category(query)
+    
+    execution_time = (time.time() - start_time) * 1000
+    
+    # Publish eval event (async, non-blocking)
+    publish_eval_event(
+        agent_name="router_agent",
+        query=f"Query: {query}",
+        response=f"Category: {category}",
+        category="router",
+        metadata={
+            "execution_time_ms": execution_time,
+            "routed_category": category,
+            "available_categories": CATEGORIES
+        }
+    )
+    
     state["category_to_be_served"] = category
     return state

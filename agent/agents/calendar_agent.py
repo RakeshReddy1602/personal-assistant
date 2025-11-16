@@ -11,6 +11,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from dotenv import load_dotenv
 from fastmcp import Client as MCPClient
+from agent.eval_queue import publish_eval_event
 
 load_dotenv()
 
@@ -101,6 +102,9 @@ async def execute_calendar_agent(query: str) -> str:
     Returns:
         Response from the calendar agent
     """
+    import time
+    start_time = time.time()
+    
     api_key = os.getenv("GEMINI_API_KEY")
     model_name = os.getenv("GEMINI_MODEL")
     
@@ -150,7 +154,19 @@ async def execute_calendar_agent(query: str) -> str:
                 # Check if model wants to call tools
                 if not response.tool_calls:
                     # Return final response
-                    return response.content if response.content else "Task completed."
+                    final_response = response.content if response.content else "Task completed."
+                    
+                    # Publish eval event (async, non-blocking)
+                    execution_time = (time.time() - start_time) * 1000
+                    publish_eval_event(
+                        agent_name="calendar_agent",
+                        query=query,
+                        response=final_response,
+                        category="calendar",
+                        metadata={"execution_time_ms": execution_time, "mcp_server": "calendar_mcp"}
+                    )
+                    
+                    return final_response
                 
                 # Add AI response to messages
                 messages.append(response)

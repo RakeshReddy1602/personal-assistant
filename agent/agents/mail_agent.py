@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from fastmcp import Client as MCPClient
 
 from agent.prompts.mail_agent_prompts.prompt import MAIL_AGENT_PROMPT
+from agent.eval_queue import publish_eval_event
 
 load_dotenv()
 
@@ -66,6 +67,9 @@ async def execute_mail_agent(query: str) -> str:
     Returns:
         Response from the mail agent
     """
+    import time
+    start_time = time.time()
+    
     api_key = os.getenv("GEMINI_API_KEY")
     model_name = os.getenv("GEMINI_MODEL")
 
@@ -115,7 +119,19 @@ async def execute_mail_agent(query: str) -> str:
                 # Check if model wants to call tools
                 if not response.tool_calls:
                     # Return final response
-                    return response.content if response.content else "Task completed."
+                    final_response = response.content if response.content else "Task completed."
+                    
+                    # Publish eval event (async, non-blocking)
+                    execution_time = (time.time() - start_time) * 1000
+                    publish_eval_event(
+                        agent_name="mail_agent",
+                        query=query,
+                        response=final_response,
+                        category="mail",
+                        metadata={"execution_time_ms": execution_time, "mcp_server": "mail_mcp"}
+                    )
+                    
+                    return final_response
                 
                 # Add AI response to messages
                 messages.append(response)
