@@ -1,4 +1,5 @@
 CATEGORIES = [
+    "greeting",
     "mail",
     "calendar",
     "drive",

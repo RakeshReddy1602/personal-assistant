@@ -12,7 +12,7 @@ def init_assistant_graph():
 # Conditional routing based on category
 def _route_decider(state: AssistantState) -> str:
     category = (state.get("category_to_be_served") or "").strip().lower()
-    if category in {"mail", "calendar", "drive", "expense_tracker"}:
+    if category in {"mail", "calendar", "drive", "expense_tracker", "greeting"}:
         return 'master'
     if category in {"resume_preparation", "resume_prep", "resume"}:
         return 'resume'
