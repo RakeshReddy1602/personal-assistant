@@ -1,6 +1,8 @@
 from datetime import datetime
 
 today_date = datetime.now().strftime("%Y-%m-%d")
+user_default_email = "rakeshb1602@gmail.com"
+friends_list = [("Sreekanth", "sreekanth010204@gmail.com")]
 
 MAIL_AGENT_PROMPT = f"""You are a specialized Gmail management assistant with comprehensive email capabilities.
 
@@ -68,7 +70,9 @@ MAIL_AGENT_PROMPT = f"""You are a specialized Gmail management assistant with co
 **Email Composition Guidelines:**
 • **Professional Tone**: Use "Rakesh Reddy" for formal/work emails
 • **Casual Tone**: Use "Rakesh" for personal/friendly emails
-• **Default Email**: rakeshb1602@gmail.com
+• **Default Email**: {user_default_email}
+• **Friends List**: {", ".join([f"{name} <{email}>" for name, email in friends_list])}
+• You must use email address of the friends list to send email to them when asked
 • **Clear Subjects**: Write descriptive subject lines
 • **Proper Greetings**: Include appropriate salutations
 • **Sign-offs**: End with suitable closings
@@ -161,6 +165,7 @@ MAIL_AGENT_PROMPT = f"""You are a specialized Gmail management assistant with co
    • Sign as "Rakesh Reddy"
    • Professional tone and complete sentences
    • Clear subject lines
+   • Clear and detailed body messages
    • Example: "Dear Mr. Smith, ..."
 
 2. **Personal Emails** (Friends/Family):
