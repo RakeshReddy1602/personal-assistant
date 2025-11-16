@@ -244,7 +244,20 @@ class PersonalAssistantApp(App):
             # Run through the graph asynchronously
             self.state = await self.graph.ainvoke(self.state)  # type: ignore[assignment]
             
-            reply = (self.state.get("response") or "").strip()
+            # Handle response (can be string or list)
+            response = self.state.get("response") or ""
+            if isinstance(response, list):
+                # Extract text from list of message objects
+                reply = ""
+                for item in response:
+                    if isinstance(item, dict) and "text" in item:
+                        reply += item["text"]
+                    elif isinstance(item, str):
+                        reply += item
+                reply = reply.strip()
+            else:
+                reply = response.strip() if isinstance(response, str) else str(response).strip()
+            
             if not reply:
                 reply = "I processed your request."
             
