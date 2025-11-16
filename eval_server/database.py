@@ -42,6 +42,10 @@ def init_db():
         status VARCHAR(50) NOT NULL,
         score DECIMAL(5, 4) DEFAULT 0.0,
         execution_time_ms DECIMAL(10, 2) DEFAULT 0.0,
+        user_input TEXT,
+        agent_output TEXT,
+        justification TEXT,
+        improvements TEXT,
         error_message TEXT,
         metadata JSONB DEFAULT '{}',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

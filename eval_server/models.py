@@ -11,6 +11,10 @@ class EvalResultCreate(BaseModel):
     status: str = Field(..., description="Status: passed, failed, error, skipped")
     score: float = Field(default=0.0, ge=0.0, le=1.0, description="Score between 0 and 1")
     execution_time_ms: float = Field(default=0.0, ge=0.0, description="Execution time in milliseconds")
+    user_input: Optional[str] = Field(None, description="User input/query")
+    agent_output: Optional[str] = Field(None, description="Agent output/response")
+    justification: Optional[str] = Field(None, description="Gemini's justification for the evaluation")
+    improvements: Optional[str] = Field(None, description="Gemini's suggested improvements")
     error_message: Optional[str] = Field(None, description="Error message if any")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
@@ -23,6 +27,10 @@ class EvalResultResponse(BaseModel):
     status: str
     score: float
     execution_time_ms: float
+    user_input: Optional[str]
+    agent_output: Optional[str]
+    justification: Optional[str]
+    improvements: Optional[str]
     error_message: Optional[str]
     metadata: Dict[str, Any]
     created_at: datetime

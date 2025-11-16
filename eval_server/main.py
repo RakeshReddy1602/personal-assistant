@@ -62,15 +62,21 @@ def health():
 def create_eval_result(result: EvalResultCreate):
     """Insert a new eval result"""
     try:
+        # Truncate very long inputs/outputs to prevent issues
+        user_input = result.user_input[:5000] if result.user_input else None
+        agent_output = result.agent_output[:5000] if result.agent_output else None
+        justification = result.justification[:2000] if result.justification else None
+        improvements = result.improvements[:2000] if result.improvements else None
+        
         with get_db_connection() as conn:
             cursor = get_db_cursor(conn)
             
             insert_sql = """
             INSERT INTO eval_results 
-                (test_name, category, status, score, execution_time_ms, error_message, metadata)
+                (test_name, category, status, score, execution_time_ms, user_input, agent_output, justification, improvements, error_message, metadata)
             VALUES 
-                (%(test_name)s, %(category)s, %(status)s, %(score)s, %(execution_time_ms)s, %(error_message)s, %(metadata)s::jsonb)
-            RETURNING id, test_name, category, status, score, execution_time_ms, error_message, metadata, created_at
+                (%(test_name)s, %(category)s, %(status)s, %(score)s, %(execution_time_ms)s, %(user_input)s, %(agent_output)s, %(justification)s, %(improvements)s, %(error_message)s, %(metadata)s::jsonb)
+            RETURNING id, test_name, category, status, score, execution_time_ms, user_input, agent_output, justification, improvements, error_message, metadata, created_at
             """
             
             cursor.execute(insert_sql, {
@@ -79,6 +85,10 @@ def create_eval_result(result: EvalResultCreate):
                 'status': result.status,
                 'score': result.score,
                 'execution_time_ms': result.execution_time_ms,
+                'user_input': user_input,
+                'agent_output': agent_output,
+                'justification': justification,
+                'improvements': improvements,
                 'error_message': result.error_message,
                 'metadata': json.dumps(result.metadata)  # Convert dict to JSON string
             })
